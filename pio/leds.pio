@@ -1,0 +1,43 @@
+;
+; Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+;
+; SPDX-License-Identifier: BSD-3-Clause
+;
+
+.program led_matrix
+.side_set 1
+
+.define public TH 2
+.define public TL 2
+.define public TR 3
+
+.wrap_target
+bitloop:
+    out x, 1       side 0 [TR]
+    jmp !x do_zero side 1 [TH]
+    jmp  bitloop   side 1 [TL]
+do_zero:
+    nop            side 0 [TL]
+.wrap
+
+% c-sdk {
+
+#include "hardware/clocks.h"
+
+static inline void led_matrix_program_init(PIO pio, uint sm, uint offset, uint pin, float freq) {
+    pio_sm_config conf = led_matrix_program_get_default_config(offset);
+    
+    pio_gpio_init(pio, pin);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+
+    sm_config_set_sideset_pins(&conf, pin);
+    sm_config_set_out_shift(&conf, false, true, 24);
+    sm_config_set_fifo_join(&conf, PIO_FIFO_JOIN_TX);
+
+    float div = clock_get_hz(clk_sys) / (freq * 10.f);
+    sm_config_set_clkdiv(&conf, div);
+
+    pio_sm_init(pio, sm, offset, &conf);
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}
