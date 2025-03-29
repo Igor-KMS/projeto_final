@@ -44,22 +44,23 @@ int long_hour, long_minute, long_weekday;
 
 void setup_struct()
 {
+
   if (!current_timer_struct.is_short)
   {
-    current_timer_struct.current_date.day = current_weekday;
+    current_timer_struct.current_date.day = current_weekday + 1;
     current_timer_struct.current_date.hour = current_hour;
     current_timer_struct.current_date.min = current_minute;
 
-    current_timer_struct.selected_date.day = long_weekday;
+    current_timer_struct.selected_date.day = current_timer_struct.is_this_week ? long_weekday + 1 : long_weekday + 8;
     current_timer_struct.selected_date.hour = long_hour;
     current_timer_struct.selected_date.min = long_minute;
   }
   else
   {
-    current_timer_struct.selected_date.day = 0;
-    current_timer_struct.selected_date.hour = short_hours;
-    current_timer_struct.selected_date.min = short_minutes;
-    current_timer_struct.selected_date.sec = short_seconds;
+    current_timer_struct.selected_date.day = short_hours >= 24 ? 2 : 1;
+    current_timer_struct.selected_date.hour = short_hours >= 24 ? 0 : short_hours;
+    current_timer_struct.selected_date.min = short_hours >= 24 ? 0 : short_minutes;
+    current_timer_struct.selected_date.sec = short_hours >= 24 ? 0 : short_seconds;
   }
 }
 
@@ -410,8 +411,8 @@ static bool setup_gpio()
 
 static void reset_state()
 {
-  current_timer_struct.current_date = (datetime_t){-1, 0, -1, 0, 0, 0, 0};
-  current_timer_struct.selected_date = (datetime_t){-1, 0, -1, 0, 0, 0, 0};
+  current_timer_struct.current_date = (datetime_t){0, 1, 1, 0, 0, 0, 0};
+  current_timer_struct.selected_date = (datetime_t){-1, -1, 1, -1, 0, 0, 0};
   current_timer_struct.is_quiet = false;
   current_timer_struct.is_this_week = true;
   current_timer_struct.is_short = true;
@@ -432,7 +433,7 @@ static void reset_state()
 void initialize_display()
 {
   if (!setup_gpio())
-    printf("    DEBUG: DISPLAY GPIO SETUP FAILED!");
+    return;
   display.width = 128;
   display.height = 64;
   display.external_vcc = false;

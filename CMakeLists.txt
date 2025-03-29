@@ -67,10 +67,11 @@ target_include_directories(FinalProject PRIVATE
 target_link_libraries(FinalProject 
         hardware_i2c
         hardware_dma
-        hardware_timer
+        hardware_rtc
         hardware_pwm
         hardware_pio
         hardware_adc
+        hardware_sync
         )
 
 pico_generate_pio_header(${PROJECT_NAME} 

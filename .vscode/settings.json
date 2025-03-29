@@ -50,6 +50,8 @@
         "buttons.h": "c",
         "leds.h": "c",
         "new": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "irq.h": "c",
+        "sync.h": "c"
     }
 }

@@ -6,6 +6,7 @@
 #include "leds.h"
 #include "joystick.h"
 #include "buttons.h"
+#include "hardware/sync.h"
 
 int main()
 {
@@ -24,33 +25,14 @@ int main()
     i += change_display_state(order[i]);
 
     if (i < 0)
-    {
       i = 0;
-    }
     else if (i >= sizeof(order))
-    {
-      i = 0;
-      hide_display();
-      setup_struct();
-      toggle_irq(BUTTON_A, false);
-      toggle_irq(BUTTON_B, false);
-      bool once = true;
-      while (1)
-      {
-        if (once)
-        {
-          if (current_timer_struct.is_short)
-          {
-            schedule_alarm_short(&current_timer_struct);
-          }
-          else
-          {
-            schedule_alarm_long(&current_timer_struct);
-          }
-          once = false;
-        }
-        sleep_ms(1000);
-      }
-    }
+      break;
   }
+  hide_display();
+  setup_struct();
+  toggle_irq(BUTTON_A, false);
+  toggle_irq(BUTTON_B, false);
+  schedule_alarm(&current_timer_struct);
+  __wfi();
 }

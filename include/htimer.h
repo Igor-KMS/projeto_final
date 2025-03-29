@@ -14,7 +14,7 @@
   extern volatile bool alarm_triggered;
 
   void initialize_timer(void);
-  void schedule_alarm_short(alarm_struct*);
-  void schedule_alarm_long(alarm_struct*);
+  void schedule_alarm(alarm_struct*);
+  void trigger_alarm();
 
 #endif
